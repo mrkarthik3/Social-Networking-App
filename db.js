@@ -1,10 +1,9 @@
+const dotenv = require("dotenv");
+dotenv.config();
 const mongodb = require("mongodb");
 
-const connectionString =
-  "mongodb+srv://dbuser1:Password123@cluster0.wkcvn.mongodb.net/complexapp?retryWrites=true&w=majority";
-
 mongodb.connect(
-  connectionString,
+  process.env.CONNECTIONSTRING,
   { useNewUrlParser: true, useUnifiedTopology: true },
   function (err, client) {
     module.exports = client.db();
@@ -17,7 +16,7 @@ mongodb.connect(
     // data is returned into module.exports. So that others can use it.
 
     const app = require("./app");
-    app.listen(3000);
+    app.listen(process.env.PORT);
 
     // We exported app.js and  loaded into this db.js file.
     // When database connection is made,
