@@ -1,5 +1,7 @@
-app.js contains Express server that listens for incoming requests
+This Social Networking App is built using the following...
 
+- MVC Architecture
 - EJS Template Engine
+- Routing
 - Nodemon
 -

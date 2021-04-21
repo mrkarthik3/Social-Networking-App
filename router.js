@@ -2,13 +2,12 @@ const express = require("express");
 const router = express.Router();
 // above line is mini express app
 
-router.get("/", function (req, res) {
-  res.render("home-guest");
-  // Renders the EJS template with name 'home-guest'
-});
+const userController = require("./controllers/userController");
+// Import controller file
 
-router.get("/about", function (req, res) {
-  res.send("You visited about page");
-});
+router.get("/", userController.home);
+// routing the request --> '/' to 'home' function inside
+// the userController.js file.
+router.post("/register", userController.register);
 
 module.exports = router;
