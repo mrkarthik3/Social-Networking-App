@@ -1,5 +1,9 @@
 const User = require("../models/Users");
 
+// Here 2 dots are required.. because Users.js is
+// present inside 'models' folder that is on equal level of
+// this folder 'controllers'
+
 exports.home = function (req, res) {
   res.render("home-guest");
   // Renders the EJS template with name 'home-guest'
