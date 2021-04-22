@@ -58,6 +58,37 @@ User.prototype.validate = function () {
   }
 };
 
+// the callback parameter below represents the
+// anon function with parameter 'result' that is passed
+// into user.login() function inside the userController.js
+
+User.prototype.login = function () {
+  // Here, we use arrow fn to not change 'this'
+  return new Promise((resolve, reject) => {
+    // You can perform Async operations here.
+
+    // When those Async actions are done,
+    // You can either resolve... or reject...
+    this.cleanUp();
+    // Search if username exists.. first.
+    // If mongoDB has it.. it will pass that document (which is an object)
+    // as parameter into attemptedUser of the callback function
+    usersCollection
+      .findOne({ username: this.data.username })
+      .then((attemptedUser) => {
+        if (attemptedUser && attemptedUser.password === this.data.password) {
+          resolve("Congrats!");
+        } else {
+          reject("invalid username / password");
+        }
+      })
+      .catch(function () {
+        reject("Please try again later");
+        // this will show up for any unforeseen error
+      });
+  });
+};
+
 User.prototype.register = function () {
   //Step 1: Validate User Data
   this.cleanUp();
