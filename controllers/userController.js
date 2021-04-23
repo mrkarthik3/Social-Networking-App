@@ -11,12 +11,22 @@ exports.home = function (req, res) {
 
 exports.login = function (req, res) {
   let user = new User(req.body);
+  // This login is going to return a Promise
+  // based on its definition inside User.js MODEL
+  // So, we use .then and .catch to handle the Promise
   user
     .login()
     .then(function (result) {
+      // when login() succeeds,
+      // the function inside .then() is called.
+      // It receives the 'resolve' from the Promise
+      req.session.user = {};
       res.send(result);
     })
     .catch(function (e) {
+      // when login() fails,
+      // the function inside .catch() is called.
+      // It receives the 'reject' from the Promise.
       res.send(e);
     });
   // Promise is used here.
