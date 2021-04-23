@@ -23,8 +23,18 @@ exports.login = function (req, res) {
       // After logging in...
       // The request object will have session object that is unique
       // for every browser visitor
-      console.log("hi");
-      res.send(result);
+      // Above operation is an async operation because of
+      // trying to update info in Db.
+
+      // Even though the session package will automatically update
+      // the session data for us, we can manually tell it to save
+      // using the .save() function
+      // res.send(result);
+
+      req.session.save(function () {
+        res.redirect("/");
+      });
+      // redirect will occur only when the save() execution is complete.
     })
     .catch(function (e) {
       // when login() fails,
@@ -40,7 +50,20 @@ exports.login = function (req, res) {
   // inside the catch()
 };
 
-exports.logout = function () {};
+exports.logout = function (req, res) {
+  req.session.destroy(function () {
+    res.redirect("/");
+  });
+  // Whatever sessionid is present in the cookie received
+  // when a request is made...This will find that sessionid
+  // and delete that from the server.
+  // res.send("You are now logged out.");
+  // Above operation takes uncertain time.
+  // So for redirecting to homepage after session
+  // is destroyed... we need to use traditional callback
+  // We are not using promises here because it is not supported
+  // by this destroy() function. It doesn't return Promise.
+};
 
 exports.register = function (req, res) {
   //   console.log(req.body);
