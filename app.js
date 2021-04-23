@@ -5,12 +5,14 @@ const app = express();
 
 // Boiler plate session configuration settings
 // By default session namager will store this session data
-// in memory, but we can override with 'store' property.
+// in server memory, but we can override with 'store' property
+// and store in MongoDB collection with name "sessions"
 let sessionOptions = session({
   secret: "JavaScript is sooo cool!",
   // Your secret could be anything! Something no one could guess
   store: new MongoStore({ client: require("./db") }),
-  // This creates a new collection in the DB with name 'sessions'
+  // This causes mongoDB client to create a new collection in the DB
+  // with name 'sessions'
   // where all session data is saved.
   resave: false,
   saveUninitialized: false,
