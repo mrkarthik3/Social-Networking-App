@@ -1,12 +1,22 @@
 const express = require("express");
 const session = require("express-session");
+const MongoStore = require("connect-mongo")(session);
 const app = express();
 
+// Boiler plate session configuration settings
+// By default session namager will store this session data
+// in memory, but we can override with 'store' property.
 let sessionOptions = session({
   secret: "JavaScript is sooo cool!",
+  // Your secret could be anything! Something no one could guess
+  store: new MongoStore({ client: require("./db") }),
+  // This creates a new collection in the DB with name 'sessions'
+  // where all session data is saved.
   resave: false,
   saveUninitialized: false,
   cookie: { maxAge: 1000 * 60 * 60 * 24, httpOnly: true },
+  // 1000 -> 1000 ms = 1 sec.
+  // Above line implies cookie is valid for 24 hours
 });
 
 app.use(sessionOptions);

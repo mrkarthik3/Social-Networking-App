@@ -4,11 +4,6 @@ const User = require("../models/User");
 // present inside 'models' folder that is on equal level of
 // this folder 'controllers'
 
-exports.home = function (req, res) {
-  res.render("home-guest");
-  // Renders the EJS template with name 'home-guest'
-};
-
 exports.login = function (req, res) {
   let user = new User(req.body);
   // This login is going to return a Promise
@@ -20,7 +15,15 @@ exports.login = function (req, res) {
       // when login() succeeds,
       // the function inside .then() is called.
       // It receives the 'resolve' from the Promise
-      req.session.user = {};
+
+      // Here we are adding a property called 'user'.
+      // Its name can be anything.
+      // It will have the following data.
+      req.session.user = { favColor: "blue", username: user.data.username };
+      // After logging in...
+      // The request object will have session object that is unique
+      // for every browser visitor
+      console.log("hi");
       res.send(result);
     })
     .catch(function (e) {
@@ -48,5 +51,17 @@ exports.register = function (req, res) {
     res.send(user.errors);
   } else {
     res.send("Congrats, No Errors");
+  }
+};
+
+exports.home = function (req, res) {
+  // The session object of request object will have user property
+  // only when a successful login occurs. Otherwise it will be empty
+  if (req.session.user) {
+    res.render("home-dashboard", { username: req.session.user.username });
+    // res.send("Welcome to our actual application");
+  } else {
+    res.render("home-guest");
+    // Renders the EJS template with name 'home-guest'
   }
 };
