@@ -20,7 +20,7 @@ exports.login = function (req, res) {
       // Here we are adding a property called 'user' ONLY if login succeeds
       // Its name can be anything.
       // It will have the following data.
-      req.session.user = { favColor: "blue", username: user.data.username };
+      req.session.user = { avatar: user.avatar, username: user.data.username };
       // After logging in...
       // The request object will have session object that is unique
       // for every browser visitor
@@ -90,23 +90,39 @@ exports.logout = function (req, res) {
 exports.register = function (req, res) {
   //   console.log(req.body);
   let user = new User(req.body);
-  user.register();
+  user
+    .register()
+    .then(() => {
+      req.session.user = { username: user.data.username, avatar: user.avatar };
+      req.session.save(function () {
+        res.redirect("/");
+      });
+    })
+    .catch((regErrors) => {
+      regErrors.forEach(function (error) {
+        req.flash("regErrors", error);
+      });
+      req.session.save(function () {
+        res.redirect("/");
+      });
+    });
   //   res.send("Thanks for trying to register");
-  if (user.errors.length) {
-    res.send(user.errors);
-  } else {
-    res.send("Congrats, No Errors");
-  }
 };
 
 exports.home = function (req, res) {
   // The session object of request object will have user property
   // only when a successful login occurs. Otherwise it will be empty
   if (req.session.user) {
-    res.render("home-dashboard", { username: req.session.user.username });
+    res.render("home-dashboard", {
+      username: req.session.user.username,
+      avatar: req.session.user.avatar,
+    });
     // res.send("Welcome to our actual application");
   } else {
-    res.render("home-guest", { errors: req.flash("errors") });
+    res.render("home-guest", {
+      errors: req.flash("errors"),
+      regErrors: req.flash("regErrors"),
+    });
     // Renders the EJS template with name 'home-guest'
   }
 };
