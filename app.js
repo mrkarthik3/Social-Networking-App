@@ -1,6 +1,10 @@
+// This is where we enable new features in our Express application.
+// This is because... Express is starting from this file only!
+
 const express = require("express");
 const session = require("express-session");
 const MongoStore = require("connect-mongo")(session);
+const flash = require("connect-flash");
 const app = express();
 
 // Boiler plate session configuration settings
@@ -22,7 +26,7 @@ let sessionOptions = session({
 });
 
 app.use(sessionOptions);
-
+app.use(flash());
 const router = require("./router");
 
 app.use(express.urlencoded({ extended: false }));

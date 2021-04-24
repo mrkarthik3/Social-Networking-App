@@ -1,3 +1,4 @@
+const { response } = require("../app");
 const User = require("../models/User");
 
 // Here 2 dots are required.. because Users.js is
@@ -16,7 +17,7 @@ exports.login = function (req, res) {
       // the function inside .then() is called.
       // It receives the 'resolve' from the Promise
 
-      // Here we are adding a property called 'user'.
+      // Here we are adding a property called 'user' ONLY if login succeeds
       // Its name can be anything.
       // It will have the following data.
       req.session.user = { favColor: "blue", username: user.data.username };
@@ -25,10 +26,12 @@ exports.login = function (req, res) {
       // for every browser visitor
       // Above operation is an async operation because of
       // trying to update info in Db.
+      // Here, the session package will update the session object in DB automatically
 
       // Even though the session package will automatically update
       // the session data for us, we can manually tell it to save
       // using the .save() function
+      // .save() will save the data to Databse
       // res.send(result);
 
       req.session.save(function () {
@@ -40,7 +43,26 @@ exports.login = function (req, res) {
       // when login() fails,
       // the function inside .catch() is called.
       // It receives the 'reject' from the Promise.
-      res.send(e);
+      // res.send(e);
+      req.flash("errors", e);
+      // errors is an array
+      // this will add a flash property to
+      // req.session. So, it becomes req.session.flash.errors
+      // This flash will have another property 'errors' like above
+      // That errors property of flash will have value from 'e'.
+
+      // Note that this flash is a DB operation.
+      // Session package will auto-store to DB
+      // whenever we call res.send or res.redirect but the time
+      // it takes is not known.
+
+      // Below will cause to save the session data in database
+      // This will ensure saving data to DB. ONLY Then..
+      // redirect will occur
+
+      req.session.save(function () {
+        res.redirect("/");
+      });
     });
   // Promise is used here.
   // Using a promise is as simple as
@@ -84,7 +106,7 @@ exports.home = function (req, res) {
     res.render("home-dashboard", { username: req.session.user.username });
     // res.send("Welcome to our actual application");
   } else {
-    res.render("home-guest");
+    res.render("home-guest", { errors: req.flash("errors") });
     // Renders the EJS template with name 'home-guest'
   }
 };
