@@ -5,6 +5,21 @@ const User = require("../models/User");
 // present inside 'models' folder that is on equal level of
 // this folder 'controllers'
 
+
+exports.mustBeLoggedIn = function(req, res, next) {
+  if(req.session.user) {
+    // If there is session data. It means... a user is logged in.
+    // Then we tell express to run next function
+    next()
+  } else {
+    req.flash("errors", "You must be logged in to perform that option");
+    req.session.save(function(){
+      res.redirect("/")
+    })
+
+  }
+}
+
 exports.login = function (req, res) {
   let user = new User(req.body);
   // This login is going to return a Promise
@@ -45,7 +60,7 @@ exports.login = function (req, res) {
       // It receives the 'reject' from the Promise.
       // res.send(e);
       req.flash("errors", e);
-      // errors is an array
+      // "errors" is an array
       // this will add a flash property to
       // req.session. So, it becomes req.session.flash.errors
       // This flash will have another property 'errors' like above
@@ -59,6 +74,7 @@ exports.login = function (req, res) {
       // Below will cause to save the session data in database
       // This will ensure saving data to DB. ONLY Then..
       // redirect will occur
+      // This will ensure that the flash object is stored in the DB.
 
       req.session.save(function () {
         res.redirect("/");
@@ -94,9 +110,14 @@ exports.register = function (req, res) {
     .register()
     .then(() => {
       req.session.user = { username: user.data.username, avatar: user.avatar };
+      // Here we are setting session data in order to redirect them to logged in page
+      // instead of sending them to a dummy page saying "Registration Successful."
+      // Since there is session data, a refresh will cause them to go into their logged in dashboard.
       req.session.save(function () {
         res.redirect("/");
       });
+      // Here we are saving this session data and then doing a redirect to homepage.
+      // This will cause the 
     })
     .catch((regErrors) => {
       regErrors.forEach(function (error) {
@@ -113,10 +134,7 @@ exports.home = function (req, res) {
   // The session object of request object will have user property
   // only when a successful login occurs. Otherwise it will be empty
   if (req.session.user) {
-    res.render("home-dashboard", {
-      username: req.session.user.username,
-      avatar: req.session.user.avatar,
-    });
+    res.render("home-dashboard");
     // res.send("Welcome to our actual application");
   } else {
     res.render("home-guest", {

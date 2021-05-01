@@ -27,6 +27,32 @@ let sessionOptions = session({
 
 app.use(sessionOptions);
 app.use(flash());
+
+
+// We need to pass session data into tempates
+// so that they show relevant data. So far...
+// we are manually passing session data ... but with a middle ware function like below
+// it becomes possible to reduce code duplication.
+app.use(function(req, res, next){
+  res.locals.user = req.session.user
+  next()
+})
+
+/*
+This  locals object will be available from within the EJS templates.
+We can add any objects/properties on to this locals object.
+
+Also, this function is run for every request.
+
+Note that this is before the router. 
+
+Therefore... this will run first and because of next()
+express will then move on to run functions for that particular route.
+
+Overall, this will ensure that we have access to user property from all of our EJS 
+templates.
+*/
+
 const router = require("./router");
 
 app.use(express.urlencoded({ extended: false }));

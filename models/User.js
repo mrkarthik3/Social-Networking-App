@@ -62,6 +62,10 @@ User.prototype.validate = function () {
 
     // Only if username is valid  then check to see if it is already taken
 
+    // the findOne method of MongoDB returns a Promise.
+    // This promise will return an object (which evaluates to 'true') if a matching document is found.
+    // Else.. it will return 'null' (which evaluates to 'false')
+
     // Here we check to see if the username typed by the user exists already in the database.
     // if it exists, an object will be returned into usernameExists, otherwise null will be returned.
     // We changed this function into 'async' in order to use 'await'
@@ -77,7 +81,7 @@ User.prototype.validate = function () {
         this.errors.push("That username is already taken");
       }
     }
-
+    // Following code.. is for finding out if the current email already exists in the database
     if (
       this.data.email.length > 2 &&
       this.data.email.length < 31 &&
@@ -91,7 +95,7 @@ User.prototype.validate = function () {
       }
     }
     resolve();
-    // resolve runs when this operation is actually completed
+    // resolve runs when all operations above it are completed
   });
 };
 
@@ -118,9 +122,9 @@ User.prototype.login = function () {
           attemptedUser &&
           bcrypt.compareSync(this.data.password, attemptedUser.password)
         ) {
-          this.data = attemptedUser;
+          this.data = attemptedUser; // This is to ensure getAvatar() has access to email of the loggedin user.
           this.getAvatar();
-          resolve("Congrats!");
+          resolve("Congrats!"); 
         } else {
           reject("invalid username / password");
         }
@@ -150,7 +154,7 @@ User.prototype.register = function () {
 
       await usersCollection.insertOne(this.data);
       this.getAvatar();
-      resolve();
+      resolve(); 
     } else {
       reject(this.errors);
     }
