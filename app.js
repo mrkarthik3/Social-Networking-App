@@ -45,7 +45,6 @@ We can add any objects/properties on to this locals object.
 Also, this function is run for every request.
 
 Note that this is before the router. 
-
 Therefore... this will run first and because of next()
 express will then move on to run functions for that particular route.
 

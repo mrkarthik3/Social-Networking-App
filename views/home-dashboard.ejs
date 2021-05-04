@@ -7,7 +7,7 @@ So, we use '-' in above line of code -->
     <div class="container py-md-5 container--narrow">
         <div class="text-center">
             <h2>Hello <strong>
-                    <%= user.username %>
+                    <%= locals.user.username %>
                 </strong>, your feed is empty.</h2>
             <p class="lead text-muted">Your feed displays the latest posts from the people you follow. If you
                 don&rsquo;t have any friends to follow that&rsquo;s okay; you can use the &ldquo;Search&rdquo; feature
@@ -15,6 +15,5 @@ So, we use '-' in above line of code -->
         </div>
     </div>
 
-    <!-- footer begins -->
     <!-- footer begins -->
     <%- include('includes/footer') %>

@@ -5,20 +5,18 @@ const User = require("../models/User");
 // present inside 'models' folder that is on equal level of
 // this folder 'controllers'
 
-
-exports.mustBeLoggedIn = function(req, res, next) {
-  if(req.session.user) {
+exports.mustBeLoggedIn = function (req, res, next) {
+  if (req.session.user) {
     // If there is session data. It means... a user is logged in.
-    // Then we tell express to run next function
-    next()
+    // Then we tell express to run next function in the router...
+    next();
   } else {
     req.flash("errors", "You must be logged in to perform that option");
-    req.session.save(function(){
-      res.redirect("/")
-    })
-
+    req.session.save(function () {
+      res.redirect("/");
+    });
   }
-}
+};
 
 exports.login = function (req, res) {
   let user = new User(req.body);
@@ -35,7 +33,11 @@ exports.login = function (req, res) {
       // Here we are adding a property called 'user' ONLY if login succeeds
       // Its name can be anything.
       // It will have the following data.
-      req.session.user = { avatar: user.avatar, username: user.data.username };
+      req.session.user = {
+        avatar: user.avatar,
+        username: user.data.username,
+        _id: user.data._id,
+      };
       // After logging in...
       // The request object will have session object that is unique
       // for every browser visitor
@@ -106,18 +108,24 @@ exports.logout = function (req, res) {
 exports.register = function (req, res) {
   //   console.log(req.body);
   let user = new User(req.body);
+  
   user
     .register()
     .then(() => {
-      req.session.user = { username: user.data.username, avatar: user.avatar };
+      req.session.user = {
+        username: user.data.username,
+        avatar: user.avatar,
+        _id: user.data._id,
+      };
       // Here we are setting session data in order to redirect them to logged in page
       // instead of sending them to a dummy page saying "Registration Successful."
       // Since there is session data, a refresh will cause them to go into their logged in dashboard.
+
       req.session.save(function () {
         res.redirect("/");
       });
       // Here we are saving this session data and then doing a redirect to homepage.
-      // This will cause the 
+      // This will cause the
     })
     .catch((regErrors) => {
       regErrors.forEach(function (error) {

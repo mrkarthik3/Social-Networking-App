@@ -8,6 +8,7 @@ let User = function (data) {
   this.errors = [];
 };
 
+
 User.prototype.cleanUp = function () {
   if (typeof this.data.username != "string") {
     this.data.username = "";
@@ -29,6 +30,7 @@ User.prototype.cleanUp = function () {
     password: this.data.password,
   };
 };
+
 
 User.prototype.validate = function () {
   return new Promise(async (resolve, reject) => {
@@ -122,9 +124,19 @@ User.prototype.login = function () {
           attemptedUser &&
           bcrypt.compareSync(this.data.password, attemptedUser.password)
         ) {
-          this.data = attemptedUser; // This is to ensure getAvatar() has access to email of the loggedin user.
+
+          this.data = attemptedUser;
+
+          // So once a user logs in all of their matching data from the database will be available on the object, and then we're using that to place the user's id into session data.
+
+          // You don't need to do this while 'registering'
+          // Because, there is enough setup inside the regiser function of userController 
+          // which adds the user inputted data immediately into session data.
+
+          console.log(this.data);
+          // This is to ensure getAvatar() has access to email of the loggedin user.
           this.getAvatar();
-          resolve("Congrats!"); 
+          resolve("Congrats!");
         } else {
           reject("invalid username / password");
         }
@@ -154,7 +166,7 @@ User.prototype.register = function () {
 
       await usersCollection.insertOne(this.data);
       this.getAvatar();
-      resolve(); 
+      resolve();
     } else {
       reject(this.errors);
     }
