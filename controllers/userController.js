@@ -147,7 +147,6 @@ exports.home = function (req, res) {
     // res.send("Welcome to our actual application");
   } else {
     res.render("home-guest", {
-      errors: req.flash("errors"),
       regErrors: req.flash("regErrors"),
     });
     // Renders the EJS template with name 'home-guest'
