@@ -64,52 +64,19 @@ Post.prototype.create = function () {
   });
 };
 
-// Post.reusablePostQuery = function () {
-//   return new Promise(async function (resolve, reject) {
-
-//     let posts = await postsCollection.aggregate([
-//       {$lookup: {from: "users", localField: "author", foreignField: "_id", as: "authorDocument"}},
-//       {$project: {
-//         title: 1,
-//         body: 1,
-//         createdDate: 1,
-//         author: {$arrayElemAt: ["$authorDocument", 0]}
-//       }}
-//     ]).toArray()
-
-
-//     posts = posts.map(function(post){
-//       post.author = {
-//         username: post.author.username,
-//         avatar: new User(post.author, true).avatar
-//       }
-//       return post
-//     })
-
-//     resolve(posts)
-//   });
-// };
-
-Post.findSingleById = function (id) {
+Post.reusablePostQuery = function (uniqueOperations) {
   return new Promise(async function (resolve, reject) {
-    if (typeof id != "string" || !ObjectID.isValid(id)) {
-      reject();
-      return;
-    }
-    let posts = await postsCollection.aggregate([
-      {$match: {_id: new ObjectID(id)}},
+    let aggOperations = uniqueOperations.concat([
       {$lookup: {from: "users", localField: "author", foreignField: "_id", as: "authorDocument"}},
       {$project: {
         title: 1,
         body: 1,
         createdDate: 1,
         author: {$arrayElemAt: ["$authorDocument", 0]}
-        // with this... author will not be an array but
-        /// a single document representing that user.
       }}
-    ]).toArray()
+    ])
 
-    // cleanup author property in each post object
+    let posts = await postsCollection.aggregate(aggOperations).toArray()
 
     posts = posts.map(function(post){
       post.author = {
@@ -119,21 +86,23 @@ Post.findSingleById = function (id) {
       return post
     })
 
-    // aggregate lets us run multiple operations
-    // it takes an array as argument and 
-    // in that array we can do multiple database operations.
-    // each operation in that array is represented as an object.
+    resolve(posts)
+  });
+};
 
-    // Note that you are currently inside postsCollection... but want to get document from usersCollection (users)
-    // Therefore, postsCollection is local and usersCollection (users) is foreign
-    // The lookup operation searches inside "users" collection based on value of "author" field's value
-    // It searches for documents which have "_id" field's property equal to that of "author" field's value
-    // Then it places that object(s) inside a property called authorDocument which has array as value.
+Post.findSingleById = function (id) {
+  return new Promise(async function (resolve, reject) {
+    if (typeof(id) != "string" || !ObjectID.isValid(id)) {
+      reject();
+      return;
+    }
+    
+    let posts = await Post.reusablePostQuery([
+      {$match: {_id: new ObjectID(id)}}
+    ])
+
     if (posts.length) {
       console.log(posts[0])
-      // console.log("_______________________________________")
-      // console.log(posts)
-
       resolve(posts[0]);
     } else {
       reject();
@@ -142,7 +111,11 @@ Post.findSingleById = function (id) {
 };
 
 Post.findByAuthorId = function(authorId) {
-
+  return Post.reusablePostQuery([
+    {$match: {author: authorId}},
+    {$sort: {createdDate: 1}}
+  ])
+ 
 }
 
 module.exports = Post;

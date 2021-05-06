@@ -157,6 +157,7 @@ exports.home = function (req, res) {
 exports.ifUserExists = function(req, res, next) {
   User.findByUsername(req.params.username).then(function(userDocument) {
     req.profileUser = userDocument;
+    // Storing the matched document to give access to next function
     next();
   }).catch(function() {
     res.render("404")
@@ -165,16 +166,22 @@ exports.ifUserExists = function(req, res, next) {
 
 exports.profilePostsScreen = function(req,res) {
 
-  // Ask our post model for posts by a certain author id
+  // ask our post model for posts by a certain author id
+
+  // The value this function resolves to should be an array of posts from database
   Post.findByAuthorId(req.profileUser._id).then(function(posts) {
-    res.render("profile", {
+
+    res.render('profile', {
       posts: posts,
       profileUsername: req.profileUser.username,
       profileAvatar: req.profileUser.avatar
     })
+    
+
   }).catch(function(){
     res.render('404')
   })
+
 
 
 }
