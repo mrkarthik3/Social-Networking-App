@@ -35,9 +35,9 @@ exports.login = function (req, res) {
       // Its name can be anything.
       // It will have the following data.
       req.session.user = {
-        avatar: user.avatar,
-        username: user.data.username,
         _id: user.data._id,
+        username: user.data.username,
+        avatar: user.avatar,
       };
       // After logging in...
       // The request object will have session object that is unique
@@ -176,7 +176,7 @@ exports.profilePostsScreen = function(req,res) {
       profileUsername: req.profileUser.username,
       profileAvatar: req.profileUser.avatar
     })
-    
+
 
   }).catch(function(){
     res.render('404')

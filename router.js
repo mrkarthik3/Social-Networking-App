@@ -33,3 +33,5 @@ router.post(
 
 router.get("/post/:id", postController.viewSingle);
 module.exports = router;
+
+router.get('/post/:id/edit', postController.viewEditScreen);
