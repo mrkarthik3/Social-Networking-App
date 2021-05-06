@@ -9,7 +9,7 @@ let Post = function (data, userid) {
   this.userid = userid;
 };
 
-Post.prototype.cleanUp = function () {
+Post.prototype.cleanUp = function () {  
   if (typeof this.data.title != "string") {
     this.data.title = "";
   }
@@ -97,7 +97,7 @@ Post.findSingleById = function (id) {
       return;
     }
     let posts = await postsCollection.aggregate([
-      {$match: {_id: ObjectID(id)}},
+      {$match: {_id: new ObjectID(id)}},
       {$lookup: {from: "users", localField: "author", foreignField: "_id", as: "authorDocument"}},
       {$project: {
         title: 1,

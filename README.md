@@ -2,7 +2,9 @@ This Social Networking App is built using the following technologies and concept
 
 - MVC Architecture
 - EJS Template Engine
-- Routing
+- Routing 
 - Environment Variables
 - Sessions - Login & Logout
 - MongoDB - CRUD
+- Flash Messaging
+- 
