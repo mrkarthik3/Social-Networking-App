@@ -28,6 +28,6 @@ exports.viewSingle = async function (req, res) {
     // We get the document with matching _id and pass that document named as 'post' as 
     // value into "post" property in above unnamed object for use inside EJS template
   } catch {
-    res.send("404 template will go here");
+    res.render("404");
   }
 };

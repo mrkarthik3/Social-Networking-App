@@ -1,6 +1,7 @@
 const postsCollection = require("../db").db().collection("posts");
 const ObjectID = require("mongodb").ObjectID;
 // Here we are loading ONLY... ObjectID part of mongodb package.
+const User = require("./User")
 
 let Post = function (data, userid) {
   this.data = data; // data is the form data submitted.
@@ -22,7 +23,7 @@ Post.prototype.cleanUp = function () {
   this.data = {
     title: this.data.title.trim(),
     body: this.data.body.trim(),
-    createDate: new Date(),
+    createdDate: new Date(),
     author: ObjectID(this.userid),
   };
 
@@ -63,21 +64,85 @@ Post.prototype.create = function () {
   });
 };
 
+// Post.reusablePostQuery = function () {
+//   return new Promise(async function (resolve, reject) {
+
+//     let posts = await postsCollection.aggregate([
+//       {$lookup: {from: "users", localField: "author", foreignField: "_id", as: "authorDocument"}},
+//       {$project: {
+//         title: 1,
+//         body: 1,
+//         createdDate: 1,
+//         author: {$arrayElemAt: ["$authorDocument", 0]}
+//       }}
+//     ]).toArray()
+
+
+//     posts = posts.map(function(post){
+//       post.author = {
+//         username: post.author.username,
+//         avatar: new User(post.author, true).avatar
+//       }
+//       return post
+//     })
+
+//     resolve(posts)
+//   });
+// };
+
 Post.findSingleById = function (id) {
   return new Promise(async function (resolve, reject) {
     if (typeof id != "string" || !ObjectID.isValid(id)) {
       reject();
       return;
     }
-    let post = await postsCollection.findOne({ _id: new ObjectID(id) });
-    // IF MongoDB finds a document with matching id, then it will return that document.
-    if (post) {
-      resolve(post);
-      // This promise will resove to the document which has matching _id.
+    let posts = await postsCollection.aggregate([
+      {$match: {_id: ObjectID(id)}},
+      {$lookup: {from: "users", localField: "author", foreignField: "_id", as: "authorDocument"}},
+      {$project: {
+        title: 1,
+        body: 1,
+        createdDate: 1,
+        author: {$arrayElemAt: ["$authorDocument", 0]}
+        // with this... author will not be an array but
+        /// a single document representing that user.
+      }}
+    ]).toArray()
+
+    // cleanup author property in each post object
+
+    posts = posts.map(function(post){
+      post.author = {
+        username: post.author.username,
+        avatar: new User(post.author, true).avatar
+      }
+      return post
+    })
+
+    // aggregate lets us run multiple operations
+    // it takes an array as argument and 
+    // in that array we can do multiple database operations.
+    // each operation in that array is represented as an object.
+
+    // Note that you are currently inside postsCollection... but want to get document from usersCollection (users)
+    // Therefore, postsCollection is local and usersCollection (users) is foreign
+    // The lookup operation searches inside "users" collection based on value of "author" field's value
+    // It searches for documents which have "_id" field's property equal to that of "author" field's value
+    // Then it places that object(s) inside a property called authorDocument which has array as value.
+    if (posts.length) {
+      console.log(posts[0])
+      // console.log("_______________________________________")
+      // console.log(posts)
+
+      resolve(posts[0]);
     } else {
       reject();
     }
   });
 };
+
+Post.findByAuthorId = function(authorId) {
+
+}
 
 module.exports = Post;

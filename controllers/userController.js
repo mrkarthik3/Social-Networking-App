@@ -1,5 +1,6 @@
-const { response } = require("../app");
 const User = require("../models/User");
+const Post = require("../models/Post");
+
 
 // Here 2 dots are required.. because Users.js is
 // present inside 'models' folder that is on equal level of
@@ -108,7 +109,7 @@ exports.logout = function (req, res) {
 exports.register = function (req, res) {
   //   console.log(req.body);
   let user = new User(req.body);
-  
+
   user
     .register()
     .then(() => {
@@ -152,3 +153,28 @@ exports.home = function (req, res) {
     // Renders the EJS template with name 'home-guest'
   }
 };
+
+exports.ifUserExists = function(req, res, next) {
+  User.findByUsername(req.params.username).then(function(userDocument) {
+    req.profileUser = userDocument;
+    next();
+  }).catch(function() {
+    res.render("404")
+  })
+}
+
+exports.profilePostsScreen = function(req,res) {
+
+  // Ask our post model for posts by a certain author id
+  Post.findByAuthorId(req.profileUser._id).then(function(posts) {
+    res.render("profile", {
+      posts: posts,
+      profileUsername: req.profileUser.username,
+      profileAvatar: req.profileUser.avatar
+    })
+  }).catch(function(){
+    res.render('404')
+  })
+
+
+}
