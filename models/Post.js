@@ -157,7 +157,7 @@ Post.findSingleById = function (id,visitorId) {
 Post.findByAuthorId = function(authorId) {
   return Post.reusablePostQuery([
     {$match: {author: authorId}},
-    {$sort: {createdDate: 1}}
+    {$sort: {createdDate: -1}}
   ])
  
 }
@@ -168,16 +168,14 @@ Post.delete = function(postIdToDelete, currentUserId) {
       let post = await Post.findSingleById(postIdToDelete, currentUserId)
       if(post.isVisitorOwner) {
         // actually delete
-        await postsCollection.deleteOne({_id: new Object(postIdToDelete)})
+        await postsCollection.deleteOne({_id: new ObjectID(postIdToDelete)})
         resolve()
       } else {
         reject()
       }
     }
-
     catch { 
       reject()
-
     }
   })
 }

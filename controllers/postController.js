@@ -34,19 +34,33 @@ exports.viewSingle = async function (req, res) {
   }
 };
 
-exports.viewEditScreen = async function(req,res) {
- try {
-  let post = await Post.findSingleById(req.params.id)
-  if(post.authorId == req.visitorId) {
-    res.render("edit-post", {post: post})
+// exports.viewEditScreen = async function(req,res) {
+//  try {
+//   let post = await Post.findSingleById(req.params.id)
+//   if(post.authorId == req.visitorId) {
+//     res.render("edit-post", {post: post})
 
-  } else {
-    req.flash("errors", "You do not have permission to perform that action.")
-    req.session.save(()=> res.redirect('/'))
+//   } else {
+//     req.flash("errors", "You do not have permission to perform that action.")
+//     req.session.save(()=> res.redirect('/'))
+//   }
+//  } catch {
+//   res.render('404')
+//  }
+// }
+
+exports.viewEditScreen = async function(req, res) {
+  try {
+    let post = await Post.findSingleById(req.params.id, req.visitorId)
+    if (post.isVisitorOwner) {
+      res.render("edit-post", {post: post})
+    } else {
+      req.flash("errors", "You do not have permission to perform that action.")
+      req.session.save(() => res.redirect("/"))
+    }
+  } catch {
+    res.render("404")
   }
- } catch {
-  res.render('404')
- }
 }
 
 exports.edit = function(req, res) {
