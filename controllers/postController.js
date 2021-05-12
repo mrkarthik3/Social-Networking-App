@@ -26,6 +26,7 @@ exports.viewSingle = async function (req, res) {
   //   res.render("single-post-screen");
   try {
     let post = await Post.findSingleById(req.params.id, req.visitorId);
+   
     res.render("single-post-screen", { post: post });
     // We get the document with matching _id and pass that document named as 'post' as 
     // value into "post" property in above unnamed object for use inside EJS template

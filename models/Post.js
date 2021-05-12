@@ -120,6 +120,7 @@ Post.reusablePostQuery = function (uniqueOperations,visitorId) {
     ])
 
     let posts = await postsCollection.aggregate(aggOperations).toArray()
+    // If there are no matches, this will resolve to null
 
     posts = posts.map(function(post){
       post.isVisitorOwner = post.authorId.equals(visitorId)

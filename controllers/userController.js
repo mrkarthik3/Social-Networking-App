@@ -166,21 +166,16 @@ exports.ifUserExists = function(req, res, next) {
 exports.profilePostsScreen = function(req,res) {
 
   // ask our post model for posts by a certain author id
-
   // The value this function resolves to should be an array of posts from database
   Post.findByAuthorId(req.profileUser._id).then(function(posts) {
-
+    console.log(posts)
     res.render('profile', {
       posts: posts,
       profileUsername: req.profileUser.username,
       profileAvatar: req.profileUser.avatar
     })
-
-
   }).catch(function(){
     res.render('404')
   })
-
-
-
 }
+
