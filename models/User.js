@@ -134,8 +134,8 @@ User.prototype.login = function () {
 
           this.data = attemptedUser;
 
-          // So once a user logs in all of their matching data from the database will be available on the object, and then we're using that to place the user's id into session data.
-
+          // So once a user logs in all of their matching data from the database will be available on the object, 
+          // and then we're using that to place the user's id into session data.
           // You don't need to do this while 'registering'
           // Because, there is enough setup inside the regiser function of userController 
           // which adds the user inputted data immediately into session data.
