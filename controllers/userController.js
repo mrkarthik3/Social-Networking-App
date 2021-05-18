@@ -1,7 +1,23 @@
 const User = require("../models/User");
 const Post = require("../models/Post");
+const Follow = require("../models/Follow");
 
 
+
+exports.sharedProfileData = async function (req,res,next) {
+  let isVisitorsProfile = false
+  let isFollowing = false
+  // If the user is logged in... then ask Follow Model
+  // if the current visitor is following the current profile
+
+  if(req.session.user){
+    isVisitorsProfile = req.profileUser._id.equals(req.session.user._id)
+    isFollowing = await Follow.isVisitorFollowing(req.profileUser._id, req.visitorId)
+  }
+  req.isVisitorsProfile = isVisitorsProfile
+  req.isFollowing = isFollowing
+  next()
+}
 // Here 2 dots are required.. because Users.js is
 // present inside 'models' folder that is on equal level of
 // this folder 'controllers'
@@ -168,14 +184,20 @@ exports.profilePostsScreen = function(req,res) {
   // ask our post model for posts by a certain author id
   // The value this function resolves to should be an array of posts from database
   Post.findByAuthorId(req.profileUser._id).then(function(posts) {
-    console.log(posts)
+    // console.log(posts)
+    // console.log(req.isFollowing)
+
     res.render('profile', {
       posts: posts,
       profileUsername: req.profileUser.username,
-      profileAvatar: req.profileUser.avatar
+      profileAvatar: req.profileUser.avatar,
+      isFollowing: req.isFollowing,
+      isVisitorsProfile: req.isVisitorsProfile
     })
   }).catch(function(){
     res.render('404')
   })
 }
+
+
 
